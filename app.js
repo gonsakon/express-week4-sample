@@ -30,4 +30,19 @@ app.use('/', indexRouter);
 app.use('/users', usersRouter);
 app.use('/posts', postRouter);
 
+// 404 錯誤
+app.use(function(req, res, next) {
+  res.status(404).json({
+    status: 'error',
+    message: "無此路由資訊",
+  });
+});
+
+// express 錯誤處理
+app.use(function(err,req,res,next){
+  res.status(500).json({
+      "err": err.message
+  })
+})
+
 module.exports = app;
