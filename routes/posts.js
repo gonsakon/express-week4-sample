@@ -1,6 +1,7 @@
 var express = require('express');
 var router = express.Router();
 const appError = require("../service/appError");
+const handleErrorAsync = require("../service/handleErrorAsync");
 const Post = require("../models/postsModel");
 const User = require("../models/usersModel");
 
@@ -17,21 +18,16 @@ router.get('/', async function(req, res, next) {
   })
 });
 
-router.post('/', async function(req, res, next) {
+router.post('/', handleErrorAsync(async function(req, res, next) {
     if(req.body.content == undefined){
       return next(appError(400,"你沒有填寫 content 資料",next))
     }
-    try{
       const newPost = await Post.create(req.body);
       // res.send('<h1>1234</h1>');
       res.status(200).json({
         status:"success",
         post: newPost
       })
-    }catch(error){
-      return next(error)
-    }
-    
-  });
+  }));
 
 module.exports = router;
