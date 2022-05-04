@@ -18,16 +18,20 @@ router.get('/', async function(req, res, next) {
 });
 
 router.post('/', async function(req, res, next) {
-    // query params
     if(req.body.content == undefined){
       return next(appError(400,"你沒有填寫 content 資料",next))
     }
-    const newPost = await Post.create(req.body);
-    // res.send('<h1>1234</h1>');
-    res.status(200).json({
-      status:"success",
-      post: newPost
-    })
+    try{
+      const newPost = await Post.create(req.body);
+      // res.send('<h1>1234</h1>');
+      res.status(200).json({
+        status:"success",
+        post: newPost
+      })
+    }catch(error){
+      return next(error)
+    }
+    
   });
 
 module.exports = router;
