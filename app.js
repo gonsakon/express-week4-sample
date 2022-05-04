@@ -9,7 +9,13 @@ const postRouter = require('./routes/posts');
 const mongoose = require('mongoose');
 const dotenv = require('dotenv');
 var app = express();
-
+// 程式出現重大錯誤時
+process.on('uncaughtException', err => {
+  // 記錄錯誤下來，等到服務都處理完後，停掉該 process
+	console.error('Uncaughted Exception！')
+	console.error(err);
+	process.exit(1);
+});
 dotenv.config({ path: './config.env' });
 const DB = process.env.DATABASE.replace(
     '<password>',
@@ -44,5 +50,8 @@ app.use(function(err,req,res,next){
       "err": err.message
   })
 })
-
+// 未捕捉到的 catch 
+process.on('unhandledRejection', (err, promise) => {
+  console.error('未捕捉到的 rejection：', promise, '原因：', err);
+});
 module.exports = app;
