@@ -6,6 +6,7 @@ var cors = require('cors')
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 const postRouter = require('./routes/posts');
+const uploadRouter = require('./routes/upload');
 const mongoose = require('mongoose');
 const dotenv = require('dotenv');
 var app = express();
@@ -35,7 +36,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
 app.use('/posts', postRouter);
-
+app.use('/upload', uploadRouter)
 // 404 錯誤
 app.use(function(req, res, next) {
   res.status(404).json({
