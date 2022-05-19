@@ -59,4 +59,16 @@ router.delete('/:id/likes',isAuth, handleErrorAsync(async(req, res, next) =>  {
     });
 
 }))
+
+router.get('/user/:id', handleErrorAsync(async(req, res, next) =>  {
+  const user = req.params.id;
+  const posts = await Post.find({user});
+
+  res.status(200).json({
+      status: 'success',
+      results: posts.length,
+      posts
+  });
+}))
+
 module.exports = router;

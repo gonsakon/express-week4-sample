@@ -5,6 +5,7 @@ const jwt = require('jsonwebtoken');
 const handleErrorAsync = require('../service/handleErrorAsync');
 const validator = require('validator');
 const User = require('../models/usersModel');
+const Post = require('../models/postsModel');
 const {isAuth,generateSendJWT} = require('../service/auth');
 const router = express.Router();
 
@@ -70,5 +71,19 @@ router.post('/updatePassword',isAuth,handleErrorAsync(async(req,res,next)=>{
     password:newPassword
   });
   generateSendJWT(user,200,res)
+}))
+
+router.get('/getLikeList',isAuth, handleErrorAsync(async(req, res, next) =>{
+
+  const likeList = await Post.find({
+    likes: { $in: [req.user.id] }
+  }).populate({
+    path:"user",
+    select:"name _id"
+  });
+  res.status(200).json({
+    status: 'success',
+    likeList
+  });
 }))
 module.exports = router;
