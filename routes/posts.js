@@ -33,4 +33,30 @@ router.post('/',isAuth, handleErrorAsync(async function(req, res, next) {
   })
 }));
 
+router.post('/:id/likes',isAuth, handleErrorAsync(async function(req, res, next) {
+  const _id = req.params.id;
+    await Post.findOneAndUpdate(
+        { _id},
+        { $addToSet: { likes: req.user.id } }
+      );
+      res.status(201).json({
+        status: 'success',
+        postId: _id,
+        userId: req.user.id
+      });
+}));
+
+router.delete('/:id/likes',isAuth, handleErrorAsync(async(req, res, next) =>  {
+  const _id = req.params.id;
+  await Post.findOneAndUpdate(
+      { _id},
+      { $pull: { likes: req.user.id } }
+    );
+    res.status(201).json({
+      status: 'success',
+      postId: _id,
+      userId: req.user.id
+    });
+
+}))
 module.exports = router;

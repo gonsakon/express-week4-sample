@@ -19,10 +19,12 @@ const postSchema = new mongoose.Schema(
           ref:"user",
           required: [true, '貼文 ID 未填寫']
       },
-      likes: {
-          type:Number,
-          default:0
+      likes: [
+        { 
+          type: mongoose.Schema.ObjectId, 
+          ref: 'User' 
         }
+      ],
     }
 );
 const Post = mongoose.model('Post', postSchema);
