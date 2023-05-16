@@ -8,6 +8,33 @@ const User = require('../models/usersModel');
 const {isAuth,generateSendJWT} = require('../service/auth');
 const router = express.Router();
 
+const dotenv = require('dotenv');
+dotenv.config({ path: './config.env' });
+const passport = require('passport');
+const GoogleStrategy = require( 'passport-google-oauth20' ).Strategy;
+passport.use(new GoogleStrategy({
+  clientID: process.env.GOOGLE_AUTH_CLIENTID,
+  clientSecret: process.env.GOOGLE_AUTH_CLIENT_SECRET,
+  callbackURL: "http://localhost:3010/users/google/callback"
+},
+async function(accessToken, refreshToken, profile, cb) {
+  console.log("測試")
+  console.log(profile)
+  try {
+    const user = await User.findOrCreate(
+      {
+        googleId: profile.id,
+        name: profile.displayName, 
+        email: profile.emails[0].value,
+      }
+    );
+    return cb(null, user);
+  } catch (err) {
+    return cb(err);
+  }
+}
+));
+
 router.post('/sign_up', handleErrorAsync(async(req, res, next) =>{
   let { email, password,confirmPassword,name } = req.body;
   // 內容不可為空
@@ -69,6 +96,15 @@ router.post('/updatePassword',isAuth,handleErrorAsync(async(req,res,next)=>{
   const user = await User.findByIdAndUpdate(req.user.id,{
     password:newPassword
   });
+  generateSendJWT(user,200,res)
+}))
+
+router.get('/google', passport.authenticate('google', {
+  scope: [ 'email', 'profile'],
+}));
+
+router.get('/google/callback', passport.authenticate('google', { session: false }), handleErrorAsync(async(req,res,next)=> {
+  const user = await User.findById(req.user.id);
   generateSendJWT(user,200,res)
 }))
 module.exports = router;

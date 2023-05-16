@@ -18,16 +18,25 @@ const userSchema = new mongoose.Schema({
     },
     password:{
       type: String,
-      required: [true,'請輸入密碼'],
       minlength: 8,
       select: false
     },
+    googleId: String,
     createdAt: {
       type: Date,
       default: Date.now,
       select: false
     }
   });
+  userSchema.statics.findOrCreate = async function (doc) {
+    let result = await this.findOne({googleId:doc.googleId});
+    if (result) {
+        return result;
+    } else {
+        result = new this(doc);
+        return await result.save();
+    }
+  }
 // User
 const User = mongoose.model('user', userSchema);
 
